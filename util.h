@@ -7,7 +7,6 @@ void pinOutput(int base, char num, char v);
 void uartEnable(int divisor);
 void uartSend(int c);
 void uartSends(char* s);
-int intDiv(int a, int b);
 void uartSendHex(int x, int d);
 void uartSendDec(int x);
 void setupPll(int mhz);

@@ -41,24 +41,6 @@ void uartSends(char* s) {
     }
 }
 
-int intDiv(int a, int b) {
-	int res = 0;
-	int power = 1;
-	while (a - b >= b) {
-		b <<= 1;
-		power <<= 1;
-	}
-	while (power > 0) {
-		if (a - b >= 0) {
-			a -= b;
-			res += power;
-		}
-		b >>= 1;
-		power >>= 1;
-	}
-	return res;
-}
-
 void uartSendHex(int x, int d) {
     while (d-- > 0) {
         uartSend(hex[(x >> (d * 4)) & 0xF]);
@@ -70,7 +52,7 @@ void uartSendDec(int x) {
     int i, x1;
     i = 0;
     while (x > 0) {
-        x1 = intDiv(x, 10);
+        x1 = x / 10;
         s[i++] = x - x1 * 10;
         x = x1;
     }
