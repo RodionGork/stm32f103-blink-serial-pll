@@ -26,8 +26,15 @@ void uartEnable(int divisor) {
     REG_L(RCC_BASE, RCC_APB2ENR) |= (1 << 14); // UART clock
     REG_L(USART_BASE, USART_BRR) |= divisor;
     REG_L(USART_BASE, USART_CR1) |= (1 << 13); // UART enable
-    REG_L(USART_BASE, USART_CR1) |= (1 << 3); // UART transmit enable
-    
+    REG_L(USART_BASE, USART_CR1) |= (3 << 2); // UART transmit/receive enable
+    REG_L(USART_BASE, USART_CR1) |= (1 << 5); // UART receive interrupt enable
+}
+
+int uartRead(void) {
+    if ((REG_L(USART_BASE, USART_SR) & (1 << 5)) == 0) {
+        return -1;
+    }
+    return REG_B(USART_BASE, USART_DR);
 }
 
 void uartSend(int c) {

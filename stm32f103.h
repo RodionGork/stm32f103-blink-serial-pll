@@ -1,6 +1,7 @@
 #ifndef __STM32F030_H_
 #define __STM32F030_H_
 
+#define REG_B(X,Y) ((unsigned char*)((void*)((X) + (Y))))[0]
 #define REG_L(X,Y) ((long*)((void*)((X) + (Y))))[0]
 
 #define RCC_BASE 0x40021000
@@ -15,6 +16,8 @@
 #define GPIOG_BASE 0x40012000
 
 #define USART_BASE 0x40013800
+
+#define NVIC_BASE 0xE000E100
 
 #define RCC_CR 0x00
 #define RCC_CFGR 0x04
@@ -33,6 +36,8 @@
 #define USART_BRR 0x08
 #define USART_CR1 0x0C
 #define USART_CR2 0x10
+
+#define NVIC_ISER 0x00
 
 
 #define PIN_MODE_IN 0
