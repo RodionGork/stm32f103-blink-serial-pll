@@ -1,6 +1,18 @@
 #include "stm32f103.h"
 
+#define UART_RX_BUF_SIZE 8
+
 char hex[] = "0123456789ABCDEF";
+unsigned char uartRxBuf[UART_RX_BUF_SIZE];
+char uartRxBufStart, uartRxBufEnd;
+
+void enableInterrupts(void) {
+    __asm("cpsie i");
+}
+
+void irqEnable(unsigned char n) {
+    REG_L(NVIC_BASE, NVIC_ISER + (n / 32) * 4) |= (1 << (n % 32));
+}
 
 void pinMode(int base, char num, char mode, char cnf) {
     int* p = (int*) (void*) (base + (num < 8 ? GPIO_CRL : GPIO_CRH));
@@ -28,13 +40,27 @@ void uartEnable(int divisor) {
     REG_L(USART_BASE, USART_CR1) |= (1 << 13); // UART enable
     REG_L(USART_BASE, USART_CR1) |= (3 << 2); // UART transmit/receive enable
     REG_L(USART_BASE, USART_CR1) |= (1 << 5); // UART receive interrupt enable
+    uartRxBufStart = 0;
+    uartRxBufEnd = 0;
+    irqEnable(IRQ_UART);
 }
 
 int uartRead(void) {
-    if ((REG_L(USART_BASE, USART_SR) & (1 << 5)) == 0) {
+    unsigned char c;
+    if (uartRxBufStart == uartRxBufEnd) {
         return -1;
     }
-    return REG_B(USART_BASE, USART_DR);
+    c = uartRxBuf[uartRxBufStart];
+    uartRxBufStart = (uartRxBufStart + 1) % UART_RX_BUF_SIZE;
+    return c;
+}
+
+void uartIrqHandler(void) {
+    char next = (uartRxBufEnd + 1) % UART_RX_BUF_SIZE;
+    uartRxBuf[uartRxBufEnd] = REG_B(USART_BASE, USART_DR);
+    if (next != uartRxBufStart) {
+        uartRxBufEnd = next;
+    }
 }
 
 void uartSend(int c) {

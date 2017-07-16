@@ -39,6 +39,7 @@
 
 #define NVIC_ISER 0x00
 
+#define IRQ_UART 37
 
 #define PIN_MODE_IN 0
 #define PIN_MODE_OUT 1
